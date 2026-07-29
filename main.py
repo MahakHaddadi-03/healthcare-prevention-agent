@@ -10,12 +10,12 @@ def run():
         "missing_fields": [],
         "follow_up_question": "",
         "completed": False,
-        "next_field": ""
+        "next_field": None,
+        "language": "en",
+        "initial_intake_done": False,
     }
 
-    print(
-        "Assistant: Hi! I'd love to get to know a bit about your health."
-    )
+    print("Assistant: Hi! I'd love to get to know a bit about your health.")
 
     while True:
 
@@ -27,16 +27,14 @@ def run():
         state["messages"].append(
             {
                 "role": "user",
-                "content": user_input
+                "content": user_input,
             }
         )
 
         state = graph.invoke(state)
 
-        print(
-            "Assistant:",
-            state["follow_up_question"]
-        )
+        if state["messages"] and state["messages"][-1]["role"] == "assistant":
+            print("Assistant:", state["messages"][-1]["content"])
 
         if state["completed"]:
             break
@@ -44,4 +42,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-
