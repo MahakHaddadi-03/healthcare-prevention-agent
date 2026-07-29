@@ -8,8 +8,6 @@ from prompts import (
     WELCOME_FA,
     RESUME_EN,
     RESUME_FA,
-    COMPLETE_EN,
-    COMPLETE_FA,
 )
 
 

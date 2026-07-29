@@ -51,3 +51,4 @@ graph_builder.add_edge(
 )
 
 graph = graph_builder.compile()
+print(graph.get_graph().draw_ascii())
