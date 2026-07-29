@@ -1,15 +1,23 @@
-from dotenv import load_dotenv
-import os
+# from dotenv import load_dotenv
+# from langchain_groq import ChatGroq
+# from pydantic import BaseModel
+# from typing import Optional
+# import os
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+# load_dotenv()
 
-load_dotenv()
+# class Person(BaseModel):
+#     name: Optional[str] = None
+#     age: Optional[int] = None
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-)
+# llm = ChatGroq(
+#     model="llama-3.1-8b-instant",
+#     api_key=os.getenv("GROQ_API_KEY"),
+#     temperature=0,
+# )
 
-response = llm.invoke("Say hello.")
+# structured = llm.with_structured_output(Person)
 
-print(response.content)
+# result = structured.invoke("My name is John. I am 23 years old.")
+
+# print(result)

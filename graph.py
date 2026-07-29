@@ -6,7 +6,7 @@ from nodes import (
     planner,
     question_generator,
     final_response,
-    route_after_checker,
+    route_after_checker
 )
 
 from state import HealthState

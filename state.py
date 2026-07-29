@@ -4,58 +4,93 @@ from pydantic import BaseModel, Field
 
 
 class HealthProfile(BaseModel):
+
     name: Optional[str] = None
+
     age: Optional[int] = None
+
     gender: Optional[str] = None
+
     height: Optional[float] = None
+
     weight: Optional[float] = None
+
     diabetes: Optional[bool] = None
+
     heart_disease: Optional[bool] = None
+
     allergies: list[str] = Field(default_factory=list)
+
     medications: list[str] = Field(default_factory=list)
+
     family_history: Optional[str] = None
+
     exercise: Optional[bool] = None
+
     smoking: Optional[bool] = None
+
+    diet: Optional[str] = None
+
     blood_pressure: Optional[str] = None
 
 
+
 class HealthState(TypedDict):
-    # Conversation history
+
     messages: list[dict[str, str]]
 
-    # User health profile
     profile: HealthProfile
 
-    # Workflow state
     missing_fields: list[str]
+
     completed: bool
+
     next_field: Optional[str]
+
     follow_up_question: str
 
-    # User preference
     language: Optional[Literal["en", "fa"]]
 
 
+
 required_fields = [
+
     "name",
+
     "age",
+
     "gender",
+
     "height",
+
     "weight",
+
     "medications",
+
     "allergies",
+
     "family_history",
+
+    "exercise",
+
+    "smoking",
+
+    "diet",
+
 ]
 
 
+
 class ExtractedInfo(BaseModel):
+
     name: Optional[str] = Field(
         default=None,
-        description="User's name and family name."
+        description="User's name."
     )
+
     age: Optional[int] = Field(
         default=None,
-        description="User's age in years."
+        description="User's age."
     )
 
     gender: Optional[str] = Field(
@@ -85,23 +120,17 @@ class ExtractedInfo(BaseModel):
 
     allergies: Optional[list[str]] = Field(
         default=None,
-        description=(
-            "List of the user's allergies. "
-            "If the user explicitly says they have no allergies, return an empty list []."
-        ),
+        description="User allergies. Return empty list if user has no allergies."
     )
 
     medications: Optional[list[str]] = Field(
         default=None,
-        description=(
-            "List of the user's current medications. "
-            "If the user explicitly says they take no medication, return an empty list []."
-        ),
+        description="User medications, vitamins, and supplements. Return empty list if none."
     )
 
     family_history: Optional[str] = Field(
         default=None,
-        description="Relevant family medical history."
+        description="Family medical history."
     )
 
     exercise: Optional[bool] = Field(
@@ -111,10 +140,15 @@ class ExtractedInfo(BaseModel):
 
     smoking: Optional[bool] = Field(
         default=None,
-        description="Whether the user currently smokes."
+        description="Whether the user smokes."
+    )
+
+    diet: Optional[str] = Field(
+        default=None,
+        description="User diet habits."
     )
 
     blood_pressure: Optional[str] = Field(
         default=None,
-        description="The user's blood pressure if mentioned."
+        description="User blood pressure if mentioned."
     )

@@ -26,11 +26,11 @@ Analysis, retrieval (RAG), and clinical suggestions are not part of Phase 1 — 
 HealthCareAgent/
 ├── app.py              # Chainlit entry point
 ├── main.py             # CLI test entry point
-├── config/              # LLM and environment configuration
-├── graph/               # LangGraph graph construction
-├── nodes/                # Individual layer implementations (interaction, completeness_checker, planner, supervisor)
-├── prompts/              # System prompts (tone, extraction)
-├── states/               # HealthProfile, HealthState, ExtractedInfo models
+├── config.py              # LLM and environment configuration
+├── graph.py               # LangGraph graph construction
+├── nodes.py                # Individual layer implementations (interaction, completeness_checker, planner, supervisor)
+├── prompts.py              # System prompts (tone, extraction)
+├── state.py               # HealthProfile, HealthState, ExtractedInfo models
 ├── storage.py            # Profile and conversation persistence
 ├── docs/
 │   └── architecture.md   # Full architecture diagrams and design notes
