@@ -1,49 +1,63 @@
 import json
 import os
+import uuid
 
+import psycopg2
+
+from database import save_profile, load_profile, save_message, load_messages
 from state import HealthProfile, HealthState
 
+# Keep this for backward compatibility during migration
 STORAGE_DIR = "user_data"
 os.makedirs(STORAGE_DIR, exist_ok=True)
 
 
 def save_state(user_id: str, state: HealthState) -> None:
-    path = os.path.join(STORAGE_DIR, f"{user_id}.json")
+    session_id = state.get("session_id", str(uuid.uuid4()))
 
-    serializable = {
-        "messages": state["messages"],
-        "profile": state["profile"].model_dump(),
-        "missing_fields": state["missing_fields"],
-        "follow_up_question": state.get("follow_up_question", ""),
-        "completed": state["completed"],
-        "next_field": state.get("next_field"),
-        "language": state.get("language"),
-    }
+    # Save profile to PostgreSQL
+    save_profile(user_id, state["profile"])
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(
-            serializable,
-            f,
-            ensure_ascii=False,
-            indent=4,
+    # Save only new messages to PostgreSQL
+    messages = state.get("messages", [])
+    if messages:
+        last_message = messages[-1]
+        save_message(
+            user_id=user_id,
+            session_id=session_id,
+            role=last_message["role"],
+            content=last_message["content"],
+            language=state.get("language", "en")
         )
 
 
-def load_state(user_id: str) -> HealthState | None:
-    path = os.path.join(STORAGE_DIR, f"{user_id}.json")
+def load_state(user_id: str, session_id: str = None) -> HealthState | None:
+    profile_data = load_profile(user_id)
 
-    if not os.path.exists(path):
+    if not profile_data:
         return None
 
-    with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    # Remove PostgreSQL metadata fields
+    profile_fields = {
+        k: v for k, v in profile_data.items()
+        if k not in ["user_id", "created_at", "updated_at"]
+    }
+    profile = HealthProfile(**profile_fields)
+
+    # Load conversation history
+    messages = []
+    if session_id:
+        raw_messages = load_messages(user_id, session_id)
+        messages = [{"role": m["role"], "content": m["content"]} for m in raw_messages]
 
     return {
-        "messages": data.get("messages", []),
-        "profile": HealthProfile(**data.get("profile", {})),
-        "missing_fields": data.get("missing_fields", []),
-        "follow_up_question": data.get("follow_up_question", ""),
-        "completed": data.get("completed", False),
-        "next_field": data.get("next_field"),
-        "language": data.get("language"),
+        "messages": messages,
+        "profile": profile,
+        "missing_fields": [],
+        "follow_up_question": "",
+        "completed": profile_data.get("completed", False),
+        "next_field": None,
+        "language": None,
+        "user_id": user_id,
+        "session_id": session_id,
     }

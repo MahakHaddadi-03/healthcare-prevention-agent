@@ -33,7 +33,19 @@ def create_initial_state(language: str) -> HealthState:
         "initial_intake_done": False,
     }
 
-
+def create_initial_state(language: str, user_id: str, session_id: str) -> HealthState:
+    return {
+        "messages": [],
+        "profile": HealthProfile(),
+        "missing_fields": [],
+        "completed": False,
+        "next_field": None,
+        "follow_up_question": "",
+        "language": language,
+        "initial_intake_done": False,
+        "user_id": user_id,
+        "session_id": session_id,
+    }
 
 
 def get_initial_intake(language):
@@ -119,22 +131,20 @@ async def start():
 
 @cl.action_callback("choose_language")
 async def choose_language(action: cl.Action):
-
     language = action.payload["language"]
-
     user_id = cl.user_session.get("id")
+    
+    import uuid
+    session_id = cl.user_session.get("session_id")
+    if not session_id:
+        session_id = str(uuid.uuid4())
+        cl.user_session.set("session_id", session_id)
 
-
-    state = load_state(user_id)
-
-
+    state = load_state(user_id, session_id)
 
     if state is None:
-
-        state = create_initial_state(language)
-
+        state = create_initial_state(language, user_id, session_id)
     else:
-
         state["language"] = language
 
 
